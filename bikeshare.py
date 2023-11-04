@@ -2,9 +2,20 @@ import time
 import pandas as pd
 import numpy as np
 
-CITY_DATA = { 'chicago': 'chicago.csv',
-              'new york city': 'new_york_city.csv',
-              'washington': 'washington.csv' }
+CITY_DATA = {
+    'chicago': 'chicago.csv',
+    'new york city': 'new_york_city.csv',
+    'washington': 'washington.csv'
+}
+
+def get_user_input(prompt, valid_options):
+    user_input = input(prompt).strip().lower()
+
+    while user_input not in valid_options:
+        print("\nInvalid input! Please choose from the provided options.\n")
+        user_input = input(prompt).strip().lower()
+
+    return user_input
 
 def get_filters():
     """
@@ -15,45 +26,44 @@ def get_filters():
         (str) month - name of the month to filter by, or "all" to apply no month filter
         (str) day - name of the day of week to filter by, or "all" to apply no day filter
     """
-   
+
     print('Hello! Let\'s explore some US bikeshare data!')
-    # TO DO: get user input for city (chicago, new york city, washington). HINT: Use a while loop to handle invalid inputs
-    user_input_city = input('\nWould you like to see data for Chicago, New York, or Washington?\nType the letters C for Chicago, NY for New York, or W for Washington: ')
-    user_input_city = user_input_city.strip().lower()
     
+    # TO DO: get user input for city (chicago, new york city, washington). HINT: Use a while loop to handle invalid inputs
     user_input_city_list = ['c', 'ny', 'w']
-    while user_input_city not in user_input_city_list:
-        print('\nYou typed wrong letter(s)!\n')
-        user_input_city = input('\nType the letters C for Chicago, NY for New York, and W for Washington: ')
-        user_input_city = user_input_city.lower()
-   
+    user_input_city = get_user_input(
+        "\nWould you like to see data for Chicago, New York, or Washington?"
+        "\nType the letters C for Chicago, NY for New York, or W for Washington: ",
+        user_input_city_list
+    )
+
     if user_input_city == 'c':
         print('\nYou choose to see data for Chicago\n')
-        city = 'chicago'
     if user_input_city == 'ny':
         print('\nYou choose to see data for New York\n')
-        city = 'new york city'
     if user_input_city == 'w':
         print('\nYou choose to see data for Washington\n')
-        city = 'washington'
+
+    city_mapping = {'c': 'chicago', 'ny': 'new york city', 'w': 'washington'}
+    city = city_mapping[user_input_city]
 
     # Initialize month and day variables
     month, day = None, None
 
-     # Prompt the user to choose between filtering by month, day, or both
+    # Prompt the user to choose between filtering by month, day, or both
     print("\nDo you want to filter the data by month, day, both, or none?\n")
-    filter_choice = input("\nEnter 'month', 'day', 'both', or none: ").strip().lower()
-
-    while filter_choice not in ('month', 'day', 'both', 'none'):
-        print("\nwrong entry! Please type 'month', 'day', 'both', or 'none' to choose your preferred filter\n")
-        filter_choice = input("\nEnter 'month' if you'd like to filter data by month, 'day' if you'd like to filter data by day, 'both' if you'd like to filter data by both month and day, or 'none' for no filter: ").strip().lower()
+    filter_choice_list = ['month', 'day', 'both', 'none']
+    filter_choice = get_user_input(
+        "Enter 'month', 'day', 'both', or 'none': ",
+        filter_choice_list
+    )
 
     # Get user input for filtering by month
     if filter_choice in ('month', 'both'):
+        months_list = ['January', 'February', 'March', 'April', 'May', 'June']
         while True:
-            print("\nWhich month would you like to filter by?\n")
             month_choice = input("Enter month name (e.g., January, February, March, April, May, or June): ").capitalize()
-            if month_choice in ['January', 'February', 'March', 'April', 'May', 'June']:
+            if month_choice in months_list:
                 month = month_choice
                 break
             else:
@@ -62,13 +72,11 @@ def get_filters():
     # Get user input for filtering by day
     if filter_choice in ('day', 'both'):
         while True:
-            print("\nWhich day of the week would you like to filter by?\n")
             day = input("Enter day name (e.g., Monday to Sunday): ").capitalize()
             if day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']:
                 break
             else:
                 print("\nInvalid day. Please enter a valid day!\n")
-
 
     print('-'*40)
     return city, month, day

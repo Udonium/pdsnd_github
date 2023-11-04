@@ -32,15 +32,15 @@ To run the project, make sure you have Python 3 installed. You can download it f
 2. Clone this repository to your local machine:
    ```shell
    git clone https://github.com/YourUsername/pdsnd_github.git
-```
+   ```
 3. Navigate to the project directory:
    ```shell
    cd pdsnd_github
-```
+   ```
 4. Run the project by executing the following command:
    ```shell
    python bikeshare.py
-```
+   ```
 
 **Using the Script:**
 
@@ -73,6 +73,9 @@ The script consists of the following main functions:
 7. `user_stats(df)`: Displays statistics on user types, gender, and birth year.
 
 8. `main()`: Controls the flow of the script and allows the user to interactively explore data and restart if needed.
+
+**Note:**
+- Some data (like gender and birth year) may not be available for all cities, so the script handles these cases.
 
 ## License
 - Licensing information will be provided in subsequent revisions

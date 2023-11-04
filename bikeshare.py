@@ -262,6 +262,15 @@ def station_stats(df):
     print('-'*40)
 
 
+def convert_trip_duration(total_trip_duration_sec):
+    """ convert trip duration from seconds into duration in hours : minutes : seconds format """
+
+    total_trip_duration_hour = total_trip_duration_sec // 3600
+    remaining_min = (total_trip_duration_sec % 3600) // 60
+    remaining_sec = total_trip_duration_sec % 60
+    return total_trip_duration_hour, remaining_min, remaining_sec
+
+
 def trip_duration_stats(df):
     """Displays statistics on trip duration."""
 
@@ -271,41 +280,29 @@ def trip_duration_stats(df):
     # TO DO: display total travel time
     # display total travel time in hours : minutes : seconds format
     total_trip_duration_sec = df['Trip Duration'].sum()
-    total_trip_duration_sec
-    total_trip_duration_hour = total_trip_duration_sec // 3600
-    remaining_min = (total_trip_duration_sec % 3600) // 60
-    remaining_sec = total_trip_duration_sec % 60
-    print('\nThe total travel time is {}hours, {}minutes, {}seconds'.format(total_trip_duration_hour, remaining_min, remaining_sec))
-
+    total_trip_duration_hour, remaining_min, remaining_sec = convert_trip_duration(total_trip_duration_sec)
+    print(f'\nThe total travel time is {total_trip_duration_hour} hours, {remaining_min} minutes, {remaining_sec} seconds')
 
     # TO DO: display mean travel time
     # Display mean travel time in seconds
     mean_trip_duration_sec = df['Trip Duration'].mean()
-    print('\nThe mean travel time is {}seconds'.format(mean_trip_duration_sec))
-
+    print(f'\nThe mean travel time is {mean_trip_duration_sec} seconds')
 
     # TO DO: display longest travel time with knownn user type
     # Remove rows with NaN in the 'User Type' column
     df.dropna(subset=['User Type'], inplace=True)
-    # display longest travel time in hours : minutes : seconds format
     max_trip_duration_sec = df['Trip Duration'].max()
-    max_trip_duration_hour = max_trip_duration_sec // 3600
-    remaining_min = (max_trip_duration_sec % 3600) // 60
-    remaining_sec = max_trip_duration_sec % 60
-    print('\nThe longest travel time is {}hours: {}minutes: {}seconds'.format(max_trip_duration_hour, remaining_min, remaining_sec))
-
+    max_trip_duration_hour, remaining_min, remaining_sec = convert_trip_duration(max_trip_duration_sec)
+    print(f'\nThe longest travel time is {max_trip_duration_hour} hours, {remaining_min} minutes, {remaining_sec} seconds')
 
     # TO DO: display shortest travel time with knownn user type
     # display shortest travel time in hours : minutes : seconds format
     min_trip_duration_sec = df['Trip Duration'].min()
-    min_trip_duration_hour = min_trip_duration_sec // 3600
-    remaining_min = (min_trip_duration_sec % 3600) // 60
-    remaining_sec = min_trip_duration_sec % 60
-    print('\nThe shortest travel time is {}hours: {}minutes: {}seconds'.format(min_trip_duration_hour, remaining_min, remaining_sec))
-
+    min_trip_duration_hour, remaining_min, remaining_sec = convert_trip_duration(min_trip_duration_sec)
+    print(f'\nThe shortest travel time is {min_trip_duration_hour} hours, {remaining_min} minutes, {remaining_sec} seconds')
 
     # TO DO: user type associated with the longest travel time and user type associated with the shortest travel time
-    
+
     # Locate the user type associated with the longest travel time
     user_type_longest = df[df['Trip Duration'] == max_trip_duration_sec]['User Type'].values[0]
 
@@ -314,7 +311,6 @@ def trip_duration_stats(df):
 
     print(f"\nThe longest travel time was made by a {user_type_longest}.\n")
     print(f"\nThe shortest travel time was made by a {user_type_shortest}.\n")
-
 
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)

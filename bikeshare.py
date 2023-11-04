@@ -2,9 +2,20 @@ import time
 import pandas as pd
 import numpy as np
 
-CITY_DATA = { 'chicago': 'chicago.csv',
-              'new york city': 'new_york_city.csv',
-              'washington': 'washington.csv' }
+CITY_DATA = {
+    'chicago': 'chicago.csv',
+    'new york city': 'new_york_city.csv',
+    'washington': 'washington.csv'
+}
+
+def get_user_input(prompt, valid_options):
+    user_input = input(prompt).strip().lower()
+
+    while user_input not in valid_options:
+        print("\nInvalid input! Please choose from the provided options.\n")
+        user_input = input(prompt).strip().lower()
+
+    return user_input
 
 def get_filters():
     """
@@ -15,45 +26,44 @@ def get_filters():
         (str) month - name of the month to filter by, or "all" to apply no month filter
         (str) day - name of the day of week to filter by, or "all" to apply no day filter
     """
-   
+
     print('Hello! Let\'s explore some US bikeshare data!')
-    # TO DO: get user input for city (chicago, new york city, washington). HINT: Use a while loop to handle invalid inputs
-    user_input_city = input('\nWould you like to see data for Chicago, New York, or Washington?\nType the letters C for Chicago, NY for New York, or W for Washington: ')
-    user_input_city = user_input_city.strip().lower()
     
+    # TO DO: get user input for city (chicago, new york city, washington). HINT: Use a while loop to handle invalid inputs
     user_input_city_list = ['c', 'ny', 'w']
-    while user_input_city not in user_input_city_list:
-        print('\nYou typed wrong letter(s)!\n')
-        user_input_city = input('\nType the letters C for Chicago, NY for New York, and W for Washington: ')
-        user_input_city = user_input_city.lower()
-   
+    user_input_city = get_user_input(
+        "\nWould you like to see data for Chicago, New York, or Washington?"
+        "\nType the letters C for Chicago, NY for New York, or W for Washington: ",
+        user_input_city_list
+    )
+
     if user_input_city == 'c':
         print('\nYou choose to see data for Chicago\n')
-        city = 'chicago'
     if user_input_city == 'ny':
         print('\nYou choose to see data for New York\n')
-        city = 'new york city'
     if user_input_city == 'w':
         print('\nYou choose to see data for Washington\n')
-        city = 'washington'
+
+    city_mapping = {'c': 'chicago', 'ny': 'new york city', 'w': 'washington'}
+    city = city_mapping[user_input_city]
 
     # Initialize month and day variables
     month, day = None, None
 
-     # Prompt the user to choose between filtering by month, day, or both
+    # Prompt the user to choose between filtering by month, day, or both
     print("\nDo you want to filter the data by month, day, both, or none?\n")
-    filter_choice = input("\nEnter 'month', 'day', 'both', or none: ").strip().lower()
-
-    while filter_choice not in ('month', 'day', 'both', 'none'):
-        print("\nwrong entry! Please type 'month', 'day', 'both', or 'none' to choose your preferred filter\n")
-        filter_choice = input("\nEnter 'month' if you'd like to filter data by month, 'day' if you'd like to filter data by day, 'both' if you'd like to filter data by both month and day, or 'none' for no filter: ").strip().lower()
+    filter_choice_list = ['month', 'day', 'both', 'none']
+    filter_choice = get_user_input(
+        "Enter 'month', 'day', 'both', or 'none': ",
+        filter_choice_list
+    )
 
     # Get user input for filtering by month
     if filter_choice in ('month', 'both'):
+        months_list = ['January', 'February', 'March', 'April', 'May', 'June']
         while True:
-            print("\nWhich month would you like to filter by?\n")
             month_choice = input("Enter month name (e.g., January, February, March, April, May, or June): ").capitalize()
-            if month_choice in ['January', 'February', 'March', 'April', 'May', 'June']:
+            if month_choice in months_list:
                 month = month_choice
                 break
             else:
@@ -62,13 +72,11 @@ def get_filters():
     # Get user input for filtering by day
     if filter_choice in ('day', 'both'):
         while True:
-            print("\nWhich day of the week would you like to filter by?\n")
             day = input("Enter day name (e.g., Monday to Sunday): ").capitalize()
             if day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']:
                 break
             else:
                 print("\nInvalid day. Please enter a valid day!\n")
-
 
     print('-'*40)
     return city, month, day
@@ -254,6 +262,15 @@ def station_stats(df):
     print('-'*40)
 
 
+def convert_trip_duration(total_trip_duration_sec):
+    """ convert trip duration from seconds into duration in hours : minutes : seconds format """
+
+    total_trip_duration_hour = total_trip_duration_sec // 3600
+    remaining_min = (total_trip_duration_sec % 3600) // 60
+    remaining_sec = total_trip_duration_sec % 60
+    return total_trip_duration_hour, remaining_min, remaining_sec
+
+
 def trip_duration_stats(df):
     """Displays statistics on trip duration."""
 
@@ -263,41 +280,29 @@ def trip_duration_stats(df):
     # TO DO: display total travel time
     # display total travel time in hours : minutes : seconds format
     total_trip_duration_sec = df['Trip Duration'].sum()
-    total_trip_duration_sec
-    total_trip_duration_hour = total_trip_duration_sec // 3600
-    remaining_min = (total_trip_duration_sec % 3600) // 60
-    remaining_sec = total_trip_duration_sec % 60
-    print('\nThe total travel time is {}hours, {}minutes, {}seconds'.format(total_trip_duration_hour, remaining_min, remaining_sec))
-
+    total_trip_duration_hour, remaining_min, remaining_sec = convert_trip_duration(total_trip_duration_sec)
+    print(f'\nThe total travel time is {total_trip_duration_hour} hours, {remaining_min} minutes, {remaining_sec} seconds')
 
     # TO DO: display mean travel time
     # Display mean travel time in seconds
     mean_trip_duration_sec = df['Trip Duration'].mean()
-    print('\nThe mean travel time is {}seconds'.format(mean_trip_duration_sec))
-
+    print(f'\nThe mean travel time is {mean_trip_duration_sec} seconds')
 
     # TO DO: display longest travel time with knownn user type
     # Remove rows with NaN in the 'User Type' column
     df.dropna(subset=['User Type'], inplace=True)
-    # display longest travel time in hours : minutes : seconds format
     max_trip_duration_sec = df['Trip Duration'].max()
-    max_trip_duration_hour = max_trip_duration_sec // 3600
-    remaining_min = (max_trip_duration_sec % 3600) // 60
-    remaining_sec = max_trip_duration_sec % 60
-    print('\nThe longest travel time is {}hours: {}minutes: {}seconds'.format(max_trip_duration_hour, remaining_min, remaining_sec))
-
+    max_trip_duration_hour, remaining_min, remaining_sec = convert_trip_duration(max_trip_duration_sec)
+    print(f'\nThe longest travel time is {max_trip_duration_hour} hours, {remaining_min} minutes, {remaining_sec} seconds')
 
     # TO DO: display shortest travel time with knownn user type
     # display shortest travel time in hours : minutes : seconds format
     min_trip_duration_sec = df['Trip Duration'].min()
-    min_trip_duration_hour = min_trip_duration_sec // 3600
-    remaining_min = (min_trip_duration_sec % 3600) // 60
-    remaining_sec = min_trip_duration_sec % 60
-    print('\nThe shortest travel time is {}hours: {}minutes: {}seconds'.format(min_trip_duration_hour, remaining_min, remaining_sec))
-
+    min_trip_duration_hour, remaining_min, remaining_sec = convert_trip_duration(min_trip_duration_sec)
+    print(f'\nThe shortest travel time is {min_trip_duration_hour} hours, {remaining_min} minutes, {remaining_sec} seconds')
 
     # TO DO: user type associated with the longest travel time and user type associated with the shortest travel time
-    
+
     # Locate the user type associated with the longest travel time
     user_type_longest = df[df['Trip Duration'] == max_trip_duration_sec]['User Type'].values[0]
 
@@ -306,7 +311,6 @@ def trip_duration_stats(df):
 
     print(f"\nThe longest travel time was made by a {user_type_longest}.\n")
     print(f"\nThe shortest travel time was made by a {user_type_shortest}.\n")
-
 
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
